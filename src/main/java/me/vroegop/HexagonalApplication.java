@@ -1,4 +1,4 @@
-package me.vroegop.hexagonal;
+package me.vroegop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

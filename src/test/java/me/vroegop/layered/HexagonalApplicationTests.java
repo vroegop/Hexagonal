@@ -1,4 +1,4 @@
-package me.vroegop.hexagonal;
+package me.vroegop.layered;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
