@@ -1,6 +1,6 @@
 package me.vroegop.hexagonal.api;
 
-import me.vroegop.layered.persistence.UserEntity;
+import me.vroegop.layered.persistence.LayeredUserEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,22 +14,22 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserEntity>> list() {
+    public ResponseEntity<List<LayeredUserEntity>> list() {
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> get(@PathVariable Long id) {
+    public ResponseEntity<LayeredUserEntity> get(@PathVariable Long id) {
         return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> create(@RequestBody Object body) {
+    public ResponseEntity<LayeredUserEntity> create(@RequestBody Object body) {
         return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserEntity> update(@PathVariable Long id, @RequestBody Object body) {
+    public ResponseEntity<LayeredUserEntity> update(@PathVariable Long id, @RequestBody Object body) {
         return ResponseEntity.notFound().build();
     }
 }

@@ -13,7 +13,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class UserEntity {
+public class LayeredUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,10 +35,10 @@ public class UserEntity {
     @Column(nullable = false)
     private Instant updatedAt = Instant.now();
 
-    public UserEntity() {
+    public LayeredUserEntity() {
     }
 
-    public UserEntity(String username, String email, String fullName) {
+    public LayeredUserEntity(String username, String email, String fullName) {
         this.username = username;
         this.email = email;
         this.fullName = fullName;
