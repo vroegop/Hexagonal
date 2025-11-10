@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hexagonal Workshop — Users</title>
+  <style>
+    :root {
+      --bg: #0f172a;        /* slate-900 */
+      --card: #111827;      /* gray-900 */
+      --muted: #94a3b8;     /* slate-400 */
+      --text: #e5e7eb;      /* gray-200 */
+      --accent: #22d3ee;    /* cyan-400 */
+      --accent-2: #8b5cf6;  /* violet-500 */
+      --ok: #22c55e;        /* green-500 */
+      --warn: #f59e0b;      /* amber-500 */
+      --err: #ef4444;       /* red-500 */
+      --border: #1f2937;    /* gray-800 */
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: linear-gradient(180deg, var(--bg), #111827 60%); color: var(--text); }
+    header { padding: 28px 20px 0; text-align: center; }
+    h1 { font-size: clamp(24px, 3vw, 34px); margin: 0; line-height: 1.2; letter-spacing: .2px; }
+    .subtitle { color: var(--muted); margin-top: 6px; font-size: 14px; }
+    .container { max-width: 1100px; margin: 24px auto 60px; padding: 0 16px; }
+
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .card { background: radial-gradient(1200px 600px at 10% -20%, rgba(34,211,238,.10), transparent 60%),
+                        radial-gradient(900px 500px at 110% -10%, rgba(139,92,246,.12), transparent 50%),
+                        var(--card);
+            border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02); }
+    .card h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: .3px; text-transform: uppercase; color: #cbd5e1; }
+
+    label { display: block; margin: 10px 0 6px; color: #cbd5e1; font-size: 12px; letter-spacing: .2px; text-transform: uppercase; }
+    input { width: 100%; padding: 10px 12px; background: #0b1220; border: 1px solid #1f2937; border-radius: 10px; color: var(--text); outline: none; }
+    input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(34,211,238,.15); }
+
+    .row { display: flex; gap: 10px; align-items: center; }
+    .row > * { flex: 1; }
+
+    button { appearance: none; border: 0; padding: 10px 12px; border-radius: 10px; color: #0b1220; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: 0 6px 14px rgba(34,211,238,.25), 0 2px 6px rgba(139,92,246,.2); transition: transform .06s ease; }
+    button:hover { transform: translateY(-1px); }
+    button.secondary { background: #0b1220; color: var(--text); border: 1px solid #1f2937; box-shadow: none; }
+
+    .status { margin-top: 12px; font-size: 12px; color: var(--muted); min-height: 18px; }
+    .status.ok { color: var(--ok); }
+    .status.warn { color: var(--warn); }
+    .status.err { color: var(--err); }
+
+    pre { background: #0b1220; border: 1px solid #1f2937; padding: 12px; border-radius: 10px; overflow: auto; max-height: 360px; }
+
+    footer { text-align: center; color: var(--muted); font-size: 12px; margin: 30px 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hexagonal Workshop — Users API</h1>
+    <div class="subtitle">Simple one‑page client to exercise the tightly‑coupled demo endpoints</div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <section class="card" id="quickstart">
+        <h2>Quick Start</h2>
+        <div class="row">
+          <button id="seed">Create sample user</button>
+          <button class="secondary" id="refresh">Refresh list</button>
+        </div>
+        <div class="status" id="quickstart-status"></div>
+      </section>
+
+      <section class="card">
+        <h2>List Users (GET /api/users)</h2>
+        <div class="row" style="margin-top:8px">
+          <button id="btn-list">GET /api/users</button>
+          <a class="secondary" title="jdbc:h2:mem:testdb" id="h2-link" href="/h2-console" target="_blank" style="display:inline-block;padding:10px 12px;border-radius:10px;border:1px solid #1f2937;background:#0b1220">H2 Console</a>
+        </div>
+        <div class="status" id="list-status"></div>
+        <pre id="list-out">[]</pre>
+      </section>
+
+      <section class="card">
+        <h2>Get User by ID (GET /api/users/{id})</h2>
+        <div class="row">
+          <input type="number" id="get-id" placeholder="id (e.g. 1)" />
+          <button id="btn-get">GET</button>
+        </div>
+        <div class="status" id="get-status"></div>
+        <pre id="get-out">{}</pre>
+      </section>
+
+      <section class="card">
+        <h2>Create User (POST /api/users)</h2>
+        <label for="c-username">Username</label>
+        <input id="c-username" placeholder="jdoe" />
+        <label for="c-email">Email</label>
+        <input id="c-email" placeholder="jdoe@example.com" />
+        <label for="c-full">Full name</label>
+        <input id="c-full" placeholder="John Doe" />
+        <div class="row" style="margin-top:10px">
+          <button id="btn-create">POST</button>
+          <button class="secondary" id="btn-clear-create">Clear</button>
+        </div>
+        <div class="status" id="create-status"></div>
+        <pre id="create-out">{}</pre>
+      </section>
+
+      <section class="card">
+        <h2>Update User (PUT /api/users/{id})</h2>
+        <div class="row">
+          <input type="number" id="u-id" placeholder="id to update (e.g. 1)" />
+        </div>
+        <label for="u-username">Username (optional)</label>
+        <input id="u-username" placeholder="new username (leave blank to keep)" />
+        <label for="u-email">Email (optional)</label>
+        <input id="u-email" placeholder="new-email@example.com" />
+        <label for="u-full">Full name (optional)</label>
+        <input id="u-full" placeholder="New Full Name" />
+        <div class="row" style="margin-top:10px">
+          <button id="btn-update">PUT</button>
+          <button class="secondary" id="btn-clear-update">Clear</button>
+        </div>
+        <div class="status" id="update-status"></div>
+        <pre id="update-out">{}</pre>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px">
+      <h2>About</h2>
+      <div style="color: var(--muted); font-size: 14px; line-height: 1.5">
+        • API base URL: <code>/api/users</code><br/>
+        • JSON uses <code>full_name</code> mapped to entity field <code>fullName</code>.<br/>
+        • This page is static and served from <code>src/main/resources/static/index.html</code>.
+      </div>
+      <div class="status" id="clock"></div>
+    </section>
+  </div>
+
+  <footer>
+    Built for the refactoring workshop • <span id="year"></span>
+  </footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const fmt = (obj) => JSON.stringify(obj, null, 2);
+
+    function setStatus(el, type, msg) {
+      el.className = `status ${type || ''}`;
+      el.textContent = msg || '';
+    }
+
+    async function api(path, options) {
+      const res = await fetch(path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, options));
+      const text = await res.text();
+      let data;
+      try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+      return { ok: res.ok, status: res.status, data };
+    }
+
+    // List
+    async function doList() {
+      setStatus($("list-status"), '', 'Loading…');
+      const r = await api('/api/users');
+      setStatus($("list-status"), r.ok ? 'ok' : 'err', r.ok ? 'OK' : `HTTP ${r.status}`);
+      $("list-out").textContent = fmt(r.data ?? []);
+      return r;
+    }
+
+    // Get by id
+    async function doGet() {
+      const id = $("get-id").value.trim();
+      if (!id) { setStatus($("get-status"), 'warn', 'Enter an id'); return; }
+      setStatus($("get-status"), '', 'Loading…');
+      const r = await api(`/api/users/${id}`);
+      setStatus($("get-status"), r.ok ? 'ok' : 'err', r.ok ? 'OK' : `HTTP ${r.status}`);
+      $("get-out").textContent = fmt(r.data ?? {});
+    }
+
+    // Create
+    async function doCreate() {
+      const payload = {
+        username: $("c-username").value.trim(),
+        email: $("c-email").value.trim(),
+        full_name: $("c-full").value.trim(),
+      };
+      if (!payload.username || !payload.email || !payload.full_name) {
+        setStatus($("create-status"), 'warn', 'username, email, full_name are required');
+        return;
+      }
+      setStatus($("create-status"), '', 'Creating…');
+      const r = await api('/api/users', { method: 'POST', body: JSON.stringify(payload) });
+      setStatus($("create-status"), r.ok ? 'ok' : 'err', r.ok ? 'Created' : `HTTP ${r.status}`);
+      $("create-out").textContent = fmt(r.data ?? {});
+      if (r.ok) doList();
+    }
+
+    // Update (partial)
+    async function doUpdate() {
+      const id = $("u-id").value.trim();
+      if (!id) { setStatus($("update-status"), 'warn', 'Enter an id to update'); return; }
+      const body = {};
+      const u = $("u-username").value.trim(); if (u) body.username = u;
+      const e = $("u-email").value.trim(); if (e) body.email = e;
+      const f = $("u-full").value.trim(); if (f) body.full_name = f;
+      if (Object.keys(body).length === 0) { setStatus($("update-status"), 'warn', 'Provide at least one field'); return; }
+      setStatus($("update-status"), '', 'Updating…');
+      const r = await api(`/api/users/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+      setStatus($("update-status"), r.ok ? 'ok' : 'err', r.ok ? 'Updated' : `HTTP ${r.status}`);
+      $("update-out").textContent = fmt(r.data ?? {});
+      if (r.ok) doList();
+    }
+
+    // Seed quickstart sample
+    async function doSeed() {
+      const sample = { username: 'jdoe', email: 'jdoe@example.com', full_name: 'John Doe' };
+      setStatus($("quickstart-status"), '', 'Creating sample…');
+      const r = await api('/api/users', { method: 'POST', body: JSON.stringify(sample) });
+      if (r.ok) {
+        setStatus($("quickstart-status"), 'ok', 'Sample user created');
+      } else if (r.status === 409) {
+        setStatus($("quickstart-status"), 'warn', 'User already exists — refreshing list');
+      } else {
+        setStatus($("quickstart-status"), 'err', `HTTP ${r.status}`);
+      }
+      doList();
+    }
+
+    // Clear helpers
+    function clearCreate() {
+      ["c-username","c-email","c-full"].forEach(id => $(id).value = '');
+      setStatus($("create-status"), '', '');
+      $("create-out").textContent = '{}';
+    }
+    function clearUpdate() {
+      ["u-id","u-username","u-email","u-full"].forEach(id => $(id).value = '');
+      setStatus($("update-status"), '', '');
+      $("update-out").textContent = '{}';
+    }
+
+    // Clock + footer year
+    function tickClock() {
+      const now = new Date();
+      $("clock").textContent = `Local time: ${now.toLocaleString()}`;
+      $("year").textContent = now.getFullYear();
+    }
+
+    // Wire up
+    $("btn-list").addEventListener('click', doList);
+    $("btn-get").addEventListener('click', doGet);
+    $("btn-create").addEventListener('click', doCreate);
+    $("btn-update").addEventListener('click', doUpdate);
+    $("btn-clear-create").addEventListener('click', clearCreate);
+    $("btn-clear-update").addEventListener('click', clearUpdate);
+    $("seed").addEventListener('click', doSeed);
+    $("refresh").addEventListener('click', doList);
+
+    // Initial load
+    tickClock();
+    setInterval(tickClock, 1000);
+    doList();
+  </script>
+</body>
+</html>
